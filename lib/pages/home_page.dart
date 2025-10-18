@@ -1,4 +1,3 @@
-// lib/pages/home_page.dart
 
 import 'package:flutter/material.dart';
 import 'package:elura_skincare_app/data/appData.dart';
