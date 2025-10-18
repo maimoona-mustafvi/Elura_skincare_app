@@ -1,9 +1,7 @@
-
 import 'package:elura_skincare_app/models/routineModel.dart';
 import 'package:elura_skincare_app/models/quickTipsModel.dart';
 
 class AppData {
-  // Morning Routine
   static Routine morningRoutine = Routine(
     title: 'Morning Routine',
     subtitle: 'Cleanse, serum, moisturize, sunscreen',
@@ -17,7 +15,6 @@ class AppData {
     ],
   );
 
-  // Evening Routine
   static Routine eveningRoutine = Routine(
     title: 'Evening Routine',
     subtitle: 'Makeup removal, cleanse, serum, night cream',
@@ -31,7 +28,11 @@ class AppData {
     ],
   );
 
-  // Quick Tips List
+  static List<Routine> allRoutines = [
+    morningRoutine,
+    eveningRoutine,
+  ];
+
   static List<Tip> quickTips = [
     Tip(
       title: 'Hydration is key',
