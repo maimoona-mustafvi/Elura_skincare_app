@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:elura_skincare_app/utils/routes.dart';
+import 'package:elura_skincare_app/pages/home_page.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -9,7 +10,6 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   String name = "";
   bool changeButton = false;
-
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
@@ -62,7 +62,7 @@ class _LoginPageState extends State<LoginPage> {
                         changeButton = true;
                       });
                       await Future.delayed(Duration(seconds: 1));
-                      //Navigator logic needs to be added for home page calling smthing like Navigator.push
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => HomePage()));
                     },
                     child: AnimatedContainer(
                       duration: Duration(seconds: 1),
