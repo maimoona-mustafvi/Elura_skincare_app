@@ -1,6 +1,7 @@
+// lib/pages/login_page.dart
+
 import 'package:flutter/material.dart';
 import 'package:elura_skincare_app/utils/routes.dart';
-import 'package:elura_skincare_app/pages/home_page.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -13,22 +14,21 @@ class _LoginPageState extends State<LoginPage> {
   final _formKey = GlobalKey<FormState>();
 
   moveToHomePage(BuildContext context) async {
-    if (_formKey.currentState!.validate()) {
-      setState(() {
-        changeButton = true;
-      });
-      await Future.delayed(Duration(seconds: 1));
-      await Navigator.pushNamed(context, MyRoutes.homeRoute);
-      setState(() {
-        changeButton = false;
-      });
-    }
+    setState(() {
+      changeButton = true;
+    });
+    await Future.delayed(Duration(seconds: 1));
+    Navigator.pushNamed(context, MyRoutes.homeRoute);
+    setState(() {
+      changeButton = false;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
     return Material(
+      color: Color(0xFFFAF7F5),
       child: SingleChildScrollView(
         child: Form(
           key: _formKey,
@@ -39,6 +39,9 @@ class _LoginPageState extends State<LoginPage> {
                 child: Image.asset(
                   "assets/images/login-pic.png",
                   fit: BoxFit.contain,
+                  errorBuilder: (context, error, stackTrace) {
+                    return Icon(Icons.image, size: 100, color: Colors.grey);
+                  },
                 ),
               ),
               SizedBox(height: 30.0),
@@ -47,6 +50,7 @@ class _LoginPageState extends State<LoginPage> {
                 style: TextStyle(
                   fontSize: 28,
                   fontWeight: FontWeight.bold,
+                  color: Colors.black87,
                 ),
               ),
               Padding(
@@ -58,6 +62,12 @@ class _LoginPageState extends State<LoginPage> {
                       decoration: InputDecoration(
                         hintText: "Enter UserName",
                         labelText: "UserName",
+                        filled: true,
+                        fillColor: Color(0xFFEFE7E1),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(15),
+                          borderSide: BorderSide.none,
+                        ),
                       ),
                       validator: (value) {
                         if (value!.isEmpty) {
@@ -70,11 +80,18 @@ class _LoginPageState extends State<LoginPage> {
                         setState(() {});
                       },
                     ),
+                    SizedBox(height: 20),
                     TextFormField(
                       obscureText: true,
                       decoration: InputDecoration(
                         hintText: "Enter Password",
                         labelText: "Password",
+                        filled: true,
+                        fillColor: Color(0xFFEFE7E1),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(15),
+                          borderSide: BorderSide.none,
+                        ),
                       ),
                       validator: (value) {
                         if (value!.isEmpty) {
@@ -87,7 +104,7 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                     SizedBox(height: 30.0),
                     InkWell(
-                      splashColor: Colors.green,
+                      splashColor: Color(0xFF9B8780),
                       onTap: () => moveToHomePage(context),
                       child: AnimatedContainer(
                         duration: Duration(seconds: 1),
@@ -95,7 +112,7 @@ class _LoginPageState extends State<LoginPage> {
                         height: 50,
                         alignment: Alignment.center,
                         decoration: BoxDecoration(
-                          color: Colors.amber,
+                          color: Color(0xFF9B8780),
                           borderRadius:
                           BorderRadius.circular(changeButton ? 50 : 8),
                         ),
