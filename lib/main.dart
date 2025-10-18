@@ -12,7 +12,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: "Online Shopping Store",
+      title: "Elura SkinCare App",
       theme: ThemeData(
         primarySwatch: Colors.deepPurple,
         textTheme: GoogleFonts.latoTextTheme(),
