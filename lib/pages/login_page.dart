@@ -1,4 +1,3 @@
-// lib/pages/login_page.dart
 
 import 'package:flutter/material.dart';
 import 'package:elura_skincare_app/utils/routes.dart';
@@ -35,9 +34,9 @@ class _LoginPageState extends State<LoginPage> {
           child: Column(
             children: [
               SizedBox(
-                height: size.height * 0.35,
+                height: size.height * 0.55,
                 child: Image.asset(
-                  "assets/images/login-pic.png",
+                  "assets/images/login_pic.jpg",
                   fit: BoxFit.contain,
                   errorBuilder: (context, error, stackTrace) {
                     return Icon(Icons.image, size: 100, color: Colors.grey);
@@ -107,7 +106,7 @@ class _LoginPageState extends State<LoginPage> {
                       splashColor: Color(0xFF9B8780),
                       onTap: () => moveToHomePage(context),
                       child: AnimatedContainer(
-                        duration: Duration(seconds: 1),
+                        duration: Duration(milliseconds:300),
                         width: changeButton ? 50 : 150,
                         height: 50,
                         alignment: Alignment.center,
