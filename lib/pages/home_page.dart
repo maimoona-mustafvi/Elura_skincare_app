@@ -3,6 +3,7 @@ import 'package:elura_skincare_app/data/appData.dart';
 import 'package:elura_skincare_app/pages/routine_page.dart';
 import 'package:elura_skincare_app/pages/AddRoutineForm.dart';
 import 'package:elura_skincare_app/widgets/quickTipsDialogBox.dart';
+import '../widgets/weather_card_dynamic.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -254,55 +255,26 @@ class HomePageState extends State<HomePage> {
                   ),
                 ),
                 SizedBox(height: 30),
-                Text(
-                  'Weather-Based Advice',
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black87,
-                  ),
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16.0),
+              child: Text(
+                'Weather-Based Advice',
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black87,
                 ),
-                SizedBox(height: 15),
-                Container(
-                  padding: EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: Color(0xFFEFE7E1),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          'Sunny',
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black87,
-                          ),
-                        ),
-                      ),
-                      Container(
-                        width: 80,
-                        height: 80,
-                        decoration: BoxDecoration(
-                          color: Color(0xFF4A9FD8),
-                          borderRadius: BorderRadius.circular(15),
-                        ),
-                        child: Icon(
-                          Icons.wb_sunny,
-                          color: Colors.white,
-                          size: 40,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                SizedBox(height: 100),
-              ],
+              ),
             ),
+            const SizedBox(height: 15),
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16.0),
+              child: WeatherCardDynamic(),
+            ),
+            ]
           ),
         ),
       ),
-    );
+    ));
   }
 }
