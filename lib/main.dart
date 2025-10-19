@@ -1,24 +1,33 @@
+// lib/main.dart
 import 'package:flutter/material.dart';
+import 'package:elura_skincare_app/pages/login_page.dart';
+import 'package:elura_skincare_app/pages/bottomNavBar.dart';
+import 'package:elura_skincare_app/utils/routes.dart';
 import 'screens/welcome.dart';
 
-void main(){
-  runApp(EluraApp());
+void main() {
+  runApp(MyApp());
 }
 
-class EluraApp extends StatelessWidget{
-  const EluraApp({super.key});
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
-  Widget build(BuildContext build){
+  Widget build(BuildContext context) {
     return MaterialApp(
-      title:'Elura',
       debugShowCheckedModeBanner: false,
+      title: 'Elura Skincare',
       theme: ThemeData(
-        primaryColor: Color.fromARGB(255, 190, 168, 125),
+        primaryColor: Color(0xFF9B8780),
+        scaffoldBackgroundColor: Color(0xFFFAF7F5),
         fontFamily: 'Roboto',
       ),
-      home: Welcome(),
-
+      initialRoute: MyRoutes.loginRoute,
+      routes: {
+        MyRoutes.loginRoute: (context) => LoginPage(),
+        MyRoutes.homeRoute: (context) => MainNavigation(),
+        '/welcome': (context) => Welcome(),  
+      },
     );
-    
   }
 }
