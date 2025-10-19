@@ -1,3 +1,5 @@
+// lib/pages/routine_detail_page.dart
+
 import 'package:flutter/material.dart';
 import 'package:elura_skincare_app/models/routineModel.dart';
 
@@ -33,6 +35,7 @@ class RoutineDetailPage extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // Image
               Container(
                 height: 250,
                 width: double.infinity,
@@ -54,6 +57,8 @@ class RoutineDetailPage extends StatelessWidget {
                 ),
               ),
               SizedBox(height: 30),
+
+              // Steps Title
               Text(
                 'Steps to Follow',
                 style: TextStyle(
@@ -63,6 +68,8 @@ class RoutineDetailPage extends StatelessWidget {
                 ),
               ),
               SizedBox(height: 20),
+
+              // Steps List
               ListView.builder(
                 shrinkWrap: true,
                 physics: NeverScrollableScrollPhysics(),

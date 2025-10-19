@@ -37,7 +37,7 @@ class _AddRoutinePageState extends State<AddRoutinePage> {
     Routine newRoutine = Routine(
       title: titleController.text,
       subtitle: subtitleController.text,
-      image: 'assets/images/routine.jpg',
+      image: 'assets/images/routine.jpg',//this part not working yet
       steps: steps,
     );
     AppData.allRoutines.add(newRoutine);
@@ -68,7 +68,6 @@ class _AddRoutinePageState extends State<AddRoutinePage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Title Input
               Text(
                 'Routine Title',
                 style: TextStyle(

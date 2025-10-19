@@ -1,5 +1,3 @@
-// lib/main.dart
-
 import 'package:flutter/material.dart';
 import 'package:elura_skincare_app/pages/login_page.dart';
 import 'package:elura_skincare_app/pages/bottomNavBar.dart';

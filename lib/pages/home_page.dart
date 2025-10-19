@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:elura_skincare_app/data/appData.dart';
+import 'package:elura_skincare_app/models/quickTipsModel.dart';
 import 'package:elura_skincare_app/pages/routine_page.dart';
 import 'package:elura_skincare_app/pages/AddRoutineForm.dart';
 import 'package:elura_skincare_app/widgets/quickTipsDialogBox.dart';
+import '../widgets/weather_card_dynamic.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -221,6 +223,8 @@ class HomePageState extends State<HomePage> {
                                   child: Image.asset(
                                     tip.image,
                                     fit: BoxFit.cover,
+                                    width: double.infinity,
+                                    height: double.infinity,
                                     errorBuilder: (context, error, stackTrace) {
                                       return Center(
                                         child: Icon(Icons.lightbulb_outline,
@@ -254,6 +258,7 @@ class HomePageState extends State<HomePage> {
                   ),
                 ),
                 SizedBox(height: 30),
+
                 Text(
                   'Weather-Based Advice',
                   style: TextStyle(
@@ -263,6 +268,7 @@ class HomePageState extends State<HomePage> {
                   ),
                 ),
                 SizedBox(height: 15),
+
                 Container(
                   padding: EdgeInsets.all(20),
                   decoration: BoxDecoration(
@@ -297,7 +303,7 @@ class HomePageState extends State<HomePage> {
                     ],
                   ),
                 ),
-                SizedBox(height: 100),
+                SizedBox(height: 80), // Extra space for bottom nav
               ],
             ),
           ),

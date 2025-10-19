@@ -1,8 +1,9 @@
 class Routine {
-  String title;
-  String subtitle;
-  String image;
-  List<String> steps;
+  final String title;
+  final String subtitle;
+  final String image;
+  final List<String> steps;
+
   Routine({
     required this.title,
     required this.subtitle,
