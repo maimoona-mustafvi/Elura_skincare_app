@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:elura_skincare_app/models/reminders.dart'; // Replace with your actual project name
+import 'package:elura_skincare_app/models/reminders.dart';
 
 class RemindersPage extends StatefulWidget {
   const RemindersPage({super.key});
