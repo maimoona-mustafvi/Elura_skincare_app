@@ -1,9 +1,11 @@
+
 class Tip {
-  String title;
-  String subtitle;
-  String image;
-  String backgroundColor;
-  String description;
+  final String title;
+  final String subtitle;
+  final String image;
+  final String backgroundColor;
+  final String description;
+
   Tip({
     required this.title,
     required this.subtitle,
