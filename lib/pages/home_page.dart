@@ -1,11 +1,10 @@
-// lib/pages/home_page.dart
-
 import 'package:flutter/material.dart';
 import 'package:elura_skincare_app/data/appData.dart';
 import 'package:elura_skincare_app/models/quickTipsModel.dart';
 import 'package:elura_skincare_app/pages/routine_page.dart';
 import 'package:elura_skincare_app/pages/AddRoutineForm.dart';
 import 'package:elura_skincare_app/widgets/quickTipsDialogBox.dart';
+import '../widgets/weather_card_dynamic.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -14,7 +13,6 @@ class HomePage extends StatefulWidget {
 
 class HomePageState extends State<HomePage> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -66,7 +64,6 @@ class HomePageState extends State<HomePage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Header with Profile Icon
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -95,8 +92,6 @@ class HomePageState extends State<HomePage> {
                   ],
                 ),
                 SizedBox(height: 30),
-
-                // Today's Routine Title
                 Text(
                   "Today's Routine",
                   style: TextStyle(
@@ -107,7 +102,6 @@ class HomePageState extends State<HomePage> {
                 ),
                 SizedBox(height: 20),
 
-                // routines
                 ListView.builder(
                   shrinkWrap: true,
                   physics: NeverScrollableScrollPhysics(),
@@ -158,7 +152,6 @@ class HomePageState extends State<HomePage> {
                                   ],
                                 ),
                               ),
-                              // Routine Image
                               Container(
                                 width: 80,
                                 height: 80,
@@ -193,8 +186,6 @@ class HomePageState extends State<HomePage> {
                   },
                 ),
                 SizedBox(height: 30),
-
-                // Quick Tips Title
                 Text(
                   'Quick Tips',
                   style: TextStyle(
@@ -204,12 +195,10 @@ class HomePageState extends State<HomePage> {
                   ),
                 ),
                 SizedBox(height: 15),
-
-                // Quick Tips Cards
                 SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
                   child: Row(
-                    children: AppData.quickTips.map<Widget>((Tip tip) {
+                    children: AppData.quickTips.map((tip) {
                       return GestureDetector(
                         onTap: () {
                           showDialog(
@@ -224,7 +213,6 @@ class HomePageState extends State<HomePage> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Container(
-                                width: 160,
                                 height: 160,
                                 decoration: BoxDecoration(
                                   color: Color(int.parse(tip.backgroundColor)),
@@ -270,7 +258,7 @@ class HomePageState extends State<HomePage> {
                   ),
                 ),
                 SizedBox(height: 30),
-                // Weather-Based Advice Title
+
                 Text(
                   'Weather-Based Advice',
                   style: TextStyle(
@@ -281,7 +269,6 @@ class HomePageState extends State<HomePage> {
                 ),
                 SizedBox(height: 15),
 
-                // Weather Card
                 Container(
                   padding: EdgeInsets.all(20),
                   decoration: BoxDecoration(

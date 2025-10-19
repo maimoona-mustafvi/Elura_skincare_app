@@ -43,7 +43,7 @@ class _MainNavigationState extends State<MainNavigation> {
               buildNavItem(Icons.quiz_outlined, 1),
               buildNavItem(Icons.calendar_today_outlined, 2),
               buildNavItem(Icons.description_outlined, 3),
-              buildNavItem(Icons.notifications_outlined, 4),
+              buildNavItem(Icons.notifications_outlined, 4 , ),
             ],
           ),
         ),
