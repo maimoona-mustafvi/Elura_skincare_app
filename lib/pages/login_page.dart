@@ -13,14 +13,21 @@ class _LoginPageState extends State<LoginPage> {
   final _formKey = GlobalKey<FormState>();
 
   moveToHomePage(BuildContext context) async {
-    setState(() {
-      changeButton = true;
-    });
-    await Future.delayed(Duration(seconds: 1));
-    Navigator.pushNamed(context, MyRoutes.homeRoute);
-    setState(() {
-      changeButton = false;
-    });
+    if (_formKey.currentState!.validate()) {
+      setState(() {
+        changeButton = true;
+      });
+      await Future.delayed(Duration(seconds: 1));
+      Navigator.pushNamed(context, MyRoutes.homeRoute);
+      setState(() {
+        changeButton = false;
+      });
+    }
+    else {
+       ScaffoldMessenger.of(context).showSnackBar(
+         SnackBar(content: Text('Please fix the errors in the form')),
+       );
+     }
   }
 
   @override
@@ -111,7 +118,7 @@ class _LoginPageState extends State<LoginPage> {
                         height: 50,
                         alignment: Alignment.center,
                         decoration: BoxDecoration(
-                          color: Color(0xFF9B8780),
+                          color: const Color.fromARGB(255, 227, 192, 162),
                           borderRadius:
                           BorderRadius.circular(changeButton ? 50 : 8),
                         ),
