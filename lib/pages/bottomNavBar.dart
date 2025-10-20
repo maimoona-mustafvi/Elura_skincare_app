@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:elura_skincare_app/pages/home_page.dart';
-import 'package:elura_skincare_app/pages/quiz_Page.dart';
+import 'package:elura_skincare_app/pages/quizwelcome.dart';
 import 'package:elura_skincare_app/pages/calender_Page.dart';
 import 'package:elura_skincare_app/pages/logs_page.dart';
 import 'package:elura_skincare_app/pages/reminders_page.dart';
@@ -14,7 +14,7 @@ class _MainNavigationState extends State<MainNavigation> {
   int selectedIndex = 0;
   final List<Widget> pages = [
     HomePage(),
-    QuizPage(),
+    Welcome(),
     CalendarPage(),
     LogPage(),
     RemindersPage(),

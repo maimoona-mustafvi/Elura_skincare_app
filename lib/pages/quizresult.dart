@@ -23,7 +23,7 @@ class QuizRecommendations extends StatelessWidget{
         name: 'CeraVe Foaming Facial Cleanser',
         description: 'Oil control cleanser for daily use',
         step: 'Step 1: Cleanser',
-        image: 'assets/images/products/foaming.png',
+        image: 'assets/images/foaming.png',
       ));
     }
     else if(skinType == 'Dry' || skinType == 'Sensitive' || skinType == 'Combination'){
@@ -31,7 +31,7 @@ class QuizRecommendations extends StatelessWidget{
         name: 'CeraVe Hydrating Cleanser',
         description: 'Gentle hydrating cleanser for daily use',
         step: 'Step 1: Cleanser',
-        image: 'assets/images/products/hydrating.png',
+        image: 'assets/images/hydrating.png',
       ));
     }
     else if(skinType == 'Normal'){
@@ -39,7 +39,7 @@ class QuizRecommendations extends StatelessWidget{
         name: 'Neutrogena Gentle Cleanser',
         description: 'Gentle hydrating cleanser for daily use',
         step: 'Step 1: Cleanser',
-        image: 'assets/images/products/daily.png',
+        image: 'assets/images/daily.png',
       ));
     }
 
@@ -48,7 +48,7 @@ class QuizRecommendations extends StatelessWidget{
         name: 'Madagascar Centella Asiatica Ampoule',
         description: 'For soothing sensitive and acne-prone skin',
         step: 'Step 2: Treatment',
-        image: 'assets/images/products/acneserum.png',
+        image: 'assets/images/acneserum.png',
       ));
     }
     else if(skinConcern == 'Pigmentation'){
@@ -56,7 +56,7 @@ class QuizRecommendations extends StatelessWidget{
         name: 'Haruharu Wonder Dark Spot Go Away Serum ',
         description: 'For acne scars and hyperpigmentation',
         step: 'Step 2: Treatment',
-        image: 'assets/images/products/darkspotgoaway.png',
+        image: 'assets/images/darkspotgoaway.png',
       ));
     }
     else if(skinConcern == 'Aging'){
@@ -64,7 +64,7 @@ class QuizRecommendations extends StatelessWidget{
         name: 'CeraVe Retinol Serum',
         description: 'For wrinkles, pores and aging',
         step: 'Step 2: Treatment',
-        image: 'assets/images/products/retinolserum.png',
+        image: 'assets/images/retinolserum.png',
       ));
     }
     else if(skinConcern == 'Dryness' || skinConcern == 'Redness'){
@@ -72,21 +72,21 @@ class QuizRecommendations extends StatelessWidget{
         name: 'Anua Azelaic Acid',
         description: 'For soothing irritated skin',
         step: 'Step 2: Treatment',
-        image: 'assets/images/products/rednessazelaicanua.png',
+        image: 'assets/images/rednessazelaicanua.png',
       ));
     }
     products.add(Product(
       name: 'Cosrx Advanced Snail 92 Cream',
       description: 'For moisturizing skin',
       step: 'Step 3: Moisturize',
-      image: 'assets/images/products/cosrx.png',
+      image: 'assets/images/cosrx.png',
     ));
     if(climate == 'Moderate' || climate == 'Cold & Dry'){
       products.add(Product(
         name: 'Haruharu Black Rice Sunscreen',
         description: 'Moisturizing sunscreen for cold and dry weather',
         step: 'Step 4: Sunscreen',
-        image: 'assets/images/products/haruharucoldrysunscreen.png',
+        image: 'assets/images/haruharucoldrysunscreen.png',
       ));
     }
     else if(climate == 'Rainy'){
@@ -94,7 +94,7 @@ class QuizRecommendations extends StatelessWidget{
         name: 'Cosrx Vitamin E Sunscreen',
         description: 'Vitalizing sunscreen for rainy weather',
         step: 'Step 4: Sunscreen',
-        image: 'assets/images/products/cosrxsunscreenrainy.png',
+        image: 'assets/images/cosrxsunscreenrainy.png',
       ));
     }
     else if(climate == 'Hot & Humid' || climate == 'Desert'){
@@ -102,7 +102,7 @@ class QuizRecommendations extends StatelessWidget{
         name: 'Klairs Airy Sunscreen',
         description: 'For hot and humid weather',
         step: 'Step 4: Sunscreen',
-        image: 'assets/images/products/klairsairy.png',
+        image: 'assets/images/klairsairy.png',
       ));
     }
     return products;

@@ -92,7 +92,7 @@ class quizState extends State<QuizStart>{
                   "Question ${currentIndex+1} of ${questions.length}",
                   style: TextStyle(
                     fontSize: 14,
-                    color: Colors.orange,
+                    color: Color.fromARGB(210, 206, 156, 90),
                   )
               ),
             ),
@@ -100,7 +100,7 @@ class quizState extends State<QuizStart>{
 
             LinearProgressIndicator(
               value: progress,
-              color: Colors.orange,
+              color: Color.fromARGB(210, 206, 156, 90),
               backgroundColor: Colors.grey,
               minHeight: 6.0,
             ),
@@ -155,7 +155,7 @@ class quizState extends State<QuizStart>{
               onPressed: nextQuestion,
               style: ElevatedButton.styleFrom(
                 minimumSize: Size(double.infinity, 55),
-                backgroundColor: Colors.orange,
+                backgroundColor: Color.fromARGB(210, 206, 156, 90),
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(30)),
               ),
