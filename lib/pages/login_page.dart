@@ -43,7 +43,7 @@ class _LoginPageState extends State<LoginPage> {
               SizedBox(
                 height: size.height * 0.55,
                 child: Image.asset(
-                  "assets/images/login_pic.jpg",
+                  "assets/images/login_image.png",
                   fit: BoxFit.contain,
                   errorBuilder: (context, error, stackTrace) {
                     return Icon(Icons.image, size: 100, color: Colors.grey);
