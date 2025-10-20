@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:elura_skincare_app/utils/routes.dart';
 
@@ -12,22 +11,33 @@ class _LoginPageState extends State<LoginPage> {
   bool changeButton = false;
   final _formKey = GlobalKey<FormState>();
 
+  final TextEditingController _usernameController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+
   moveToHomePage(BuildContext context) async {
     if (_formKey.currentState!.validate()) {
       setState(() {
         changeButton = true;
       });
+
       await Future.delayed(Duration(seconds: 1));
+
+      _usernameController.clear();
+      _passwordController.clear();
+      setState(() {
+        name = "";
+      });
+
       Navigator.pushNamed(context, MyRoutes.homeRoute);
+
       setState(() {
         changeButton = false;
       });
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Please fix the errors in the form')),
+      );
     }
-    else {
-       ScaffoldMessenger.of(context).showSnackBar(
-         SnackBar(content: Text('Please fix the errors in the form')),
-       );
-     }
   }
 
   @override
@@ -43,7 +53,7 @@ class _LoginPageState extends State<LoginPage> {
               SizedBox(
                 height: size.height * 0.55,
                 child: Image.asset(
-                  "assets/images/login_image.png",
+                  "assets/images/login_pic.jpg",
                   fit: BoxFit.contain,
                   errorBuilder: (context, error, stackTrace) {
                     return Icon(Icons.image, size: 100, color: Colors.grey);
@@ -60,11 +70,11 @@ class _LoginPageState extends State<LoginPage> {
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.symmetric(
-                    vertical: 16.0, horizontal: 32.0),
+                padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 32.0),
                 child: Column(
                   children: [
                     TextFormField(
+                      controller: _usernameController,
                       decoration: InputDecoration(
                         hintText: "Enter UserName",
                         labelText: "UserName",
@@ -82,12 +92,14 @@ class _LoginPageState extends State<LoginPage> {
                         return null;
                       },
                       onChanged: (value) {
-                        name = value;
-                        setState(() {});
+                        setState(() {
+                          name = value;
+                        });
                       },
                     ),
                     SizedBox(height: 20),
                     TextFormField(
+                      controller: _passwordController,
                       obscureText: true,
                       decoration: InputDecoration(
                         hintText: "Enter Password",
@@ -113,25 +125,24 @@ class _LoginPageState extends State<LoginPage> {
                       splashColor: Color(0xFF9B8780),
                       onTap: () => moveToHomePage(context),
                       child: AnimatedContainer(
-                        duration: Duration(milliseconds:300),
+                        duration: Duration(milliseconds: 300),
                         width: changeButton ? 50 : 150,
                         height: 50,
                         alignment: Alignment.center,
                         decoration: BoxDecoration(
                           color: const Color.fromARGB(255, 227, 192, 162),
-                          borderRadius:
-                          BorderRadius.circular(changeButton ? 50 : 8),
+                          borderRadius: BorderRadius.circular(changeButton ? 50 : 8),
                         ),
                         child: changeButton
                             ? Icon(Icons.done, color: Colors.white)
                             : Text(
-                          "Login",
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 18,
-                          ),
-                        ),
+                                "Login",
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 18,
+                                ),
+                              ),
                       ),
                     ),
                   ],
