@@ -1,6 +1,6 @@
+import 'package:elura_skincare_app/pages/quizresult.dart';
 import 'package:flutter/material.dart';
 import '../models/questions.dart';
-import 'quizresult.dart';
 
 class QuizStart extends StatefulWidget{
   @override

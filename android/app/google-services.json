@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "499664339630",
+    "project_id": "elura-e49ee",
+    "storage_bucket": "elura-e49ee.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:499664339630:android:7b975274161429a6af633f",
+        "android_client_info": {
+          "package_name": "com.example.elura_skincare_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBao-5mZ6_bh0BGnm1lEu2ALYbsBV87XnA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

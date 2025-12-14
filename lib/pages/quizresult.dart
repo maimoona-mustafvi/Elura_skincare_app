@@ -1,328 +1,236 @@
 import 'package:flutter/material.dart';
 import '../models/questions.dart';
 import '../models/product.dart';
+import '../services/ml_service_csv.dart';
 
-class QuizRecommendations extends StatelessWidget{
+class QuizRecommendations extends StatefulWidget {
   final Map<int, String> userLogs;
   final List<Questions> questions;
 
-  QuizRecommendations({
+  const QuizRecommendations({
+    super.key,
     required this.userLogs,
     required this.questions,
   });
 
-  List<Product> getRecommendations(){
-    List<Product> products = [];
+  @override
+  State<QuizRecommendations> createState() => _QuizRecommendationsState();
+}
 
-    String skinType = userLogs[0]!;
-    String skinConcern = userLogs[1]!;
-    String climate = userLogs[4]!;
+class _QuizRecommendationsState extends State<QuizRecommendations> {
+  late MLServiceWithCSV _mlService;
 
-    if(skinType == 'Oily'){
-      products.add(Product(
-        name: 'CeraVe Foaming Facial Cleanser',
-        description: 'Oil control cleanser for daily use',
-        step: 'Step 1: Cleanser',
-        image: 'assets/images/foaming.png',
-      ));
-    }
-    else if(skinType == 'Dry' || skinType == 'Sensitive' || skinType == 'Combination'){
-      products.add(Product(
-        name: 'CeraVe Hydrating Cleanser',
-        description: 'Gentle hydrating cleanser for daily use',
-        step: 'Step 1: Cleanser',
-        image: 'assets/images/hydrating.png',
-      ));
-    }
-    else if(skinType == 'Normal'){
-      products.add(Product(
-        name: 'Neutrogena Gentle Cleanser',
-        description: 'Gentle hydrating cleanser for daily use',
-        step: 'Step 1: Cleanser',
-        image: 'assets/images/daily.png',
-      ));
-    }
+  List<Product> _recommendedProducts = [];
+  Map<String, dynamic> _modelInfo = {};
 
-    if(skinConcern == 'Acne'){
-      products.add(Product(
-        name: 'Madagascar Centella Asiatica Ampoule',
-        description: 'For soothing sensitive and acne-prone skin',
-        step: 'Step 2: Treatment',
-        image: 'assets/images/acneserum.png',
-      ));
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _mlService = MLServiceWithCSV();
+    _processRecommendations();
+  }
+
+  Future<void> _processRecommendations() async {
+    setState(() => _isLoading = true);
+
+    try {
+      await Future.delayed(const Duration(milliseconds: 1800));
+
+      final products =
+          await _mlService.predictProducts(widget.userLogs);
+      final info =
+          await _mlService.getModelInfo();
+
+      setState(() {
+        _recommendedProducts = products;
+        _modelInfo = info;
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() => _isLoading = false);
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: $e')),
+        );
+      }
     }
-    else if(skinConcern == 'Pigmentation'){
-      products.add(Product(
-        name: 'Haruharu Wonder Dark Spot Go Away Serum ',
-        description: 'For acne scars and hyperpigmentation',
-        step: 'Step 2: Treatment',
-        image: 'assets/images/darkspotgoaway.png',
-      ));
-    }
-    else if(skinConcern == 'Aging'){
-      products.add(Product(
-        name: 'CeraVe Retinol Serum',
-        description: 'For wrinkles, pores and aging',
-        step: 'Step 2: Treatment',
-        image: 'assets/images/retinolserum.png',
-      ));
-    }
-    else if(skinConcern == 'Dryness' || skinConcern == 'Redness'){
-      products.add(Product(
-        name: 'Anua Azelaic Acid',
-        description: 'For soothing irritated skin',
-        step: 'Step 2: Treatment',
-        image: 'assets/images/rednessazelaicanua.png',
-      ));
-    }
-    products.add(Product(
-      name: 'Cosrx Advanced Snail 92 Cream',
-      description: 'For moisturizing skin',
-      step: 'Step 3: Moisturize',
-      image: 'assets/images/cosrx.png',
-    ));
-    if(climate == 'Moderate' || climate == 'Cold & Dry'){
-      products.add(Product(
-        name: 'Haruharu Black Rice Sunscreen',
-        description: 'Moisturizing sunscreen for cold and dry weather',
-        step: 'Step 4: Sunscreen',
-        image: 'assets/images/haruharucoldrysunscreen.png',
-      ));
-    }
-    else if(climate == 'Rainy'){
-      products.add(Product(
-        name: 'Cosrx Vitamin E Sunscreen',
-        description: 'Vitalizing sunscreen for rainy weather',
-        step: 'Step 4: Sunscreen',
-        image: 'assets/images/cosrxsunscreenrainy.png',
-      ));
-    }
-    else if(climate == 'Hot & Humid' || climate == 'Desert'){
-      products.add(Product(
-        name: 'Klairs Airy Sunscreen',
-        description: 'For hot and humid weather',
-        step: 'Step 4: Sunscreen',
-        image: 'assets/images/klairsairy.png',
-      ));
-    }
-    return products;
   }
 
   @override
   Widget build(BuildContext context) {
-    final products = getRecommendations();
-
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
         leading: IconButton(
-          icon: Icon(Icons.close, color:Colors.black),
+          icon: const Icon(Icons.close, color: Colors.black),
           onPressed: () => Navigator.pop(context),
         ),
-        title: Text("Recommendations",
-          style: TextStyle(
-            color: Colors.black,
-          ),),
+        title: const Text(
+          "Your Recommendations",
+          style: TextStyle(color: Colors.black),
+        ),
         centerTitle: true,
-      ),
-      backgroundColor: Colors.white,
-
-      body: Column(
-        children: [
-          Container(
-            width: double.infinity,
-            padding: EdgeInsets.all(20),
-            color: Colors.white,
-            child: Column(
-              children: [
-                Icon(
-                  Icons.check_circle,
-                  size: 60,
-                  color: Color.fromARGB(210, 206, 156, 90),
-                ),
-                SizedBox(height:16),
-                Text(
-                  "Your personalized routine",
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
-                  ),
-                ),
-                SizedBox(height:20),
-                Text(
-                  'Follow these steps daily for best results',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.grey[600],
-                  ),
-                ),
-              ],
-            ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.info_outline, color: Colors.black54),
+            onPressed: _showModelInfo,
           ),
-          Expanded(
-            child: ListView.builder(
-                padding: EdgeInsets.symmetric(horizontal:24, vertical:20),
-                itemCount: products.length,
-                itemBuilder: (context, index){
-                  final product = products[index];
-                  final lastProduct = index == products.length -1;
-
-                  return Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children:[
-                      Column(
-                        children:[
-                          Container(
-                            width: 40,
-                            height: 40,
-                            decoration: BoxDecoration(
-                              color: Color.fromARGB(255, 185, 144, 90),
-                              shape: BoxShape.circle,
-                              border: Border.all(
-                                  color: Colors.white,
-                                  width: 3
-                              ),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Color.fromARGB(255, 179, 134, 76),
-                                  spreadRadius: 2.0,
-                                  blurRadius: 6.0,
-                                ),
-                              ],
-                            ),
-                            child: Center(
-                              child: Text(
-                                '${index+1}',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16,
-                                ),
-                              ),
-                            ),
-                          ),
-                          if(!lastProduct)
-                            Container(
-                              width: 3,
-                              height: 100,
-                              decoration: BoxDecoration(
-                                gradient: LinearGradient(
-                                  begin: Alignment.topCenter,
-                                  end: Alignment.bottomCenter,
-                                  colors: [
-                                    Color.fromARGB(255, 185, 144, 90),
-                                    Color.fromARGB(255, 185, 144, 90).withOpacity(0.3), //warna line nazar nahi aa rahi thi
-                                  ],
-                                ),
-                              ),
-                            ),
-                          SizedBox(width:16),
-                        ],
-                      ),
-                      Expanded(
-                        child: Container(
-                          margin: EdgeInsets.only(bottom: lastProduct ? 0:20 //for spacing b/w the product parts)
-                          ),
-                          padding: EdgeInsets.all(16),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                          child: Row(
-                            children: [
-                              Container(
-                                width:80,
-                                height: 80,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(16),
-                                  image: DecorationImage(
-                                    image: AssetImage(product.image),
-                                    fit: BoxFit.cover,
-                                  ),
-                                ),
-                              ),
-                              SizedBox(width:16),//for space between image and text pehle nahi tha
-
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      product.step,
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.w600,
-                                        letterSpacing: 0.5,
-                                        color: Color.fromARGB(255, 185, 144, 106),
-                                      ),
-                                    ),
-                                    SizedBox(height:6),
-
-                                    Text(
-                                      product.name,
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold,
-                                        letterSpacing: 0.5,
-                                        color: Colors.black,
-                                      ),
-                                      maxLines: 2,
-                                    ),
-                                    SizedBox(height:4),
-
-                                    Text(
-                                      product.description,
-                                      style: TextStyle(
-                                        fontSize: 13,
-                                        color: Colors.grey,
-                                      ),
-                                      maxLines: 2,
-                                    ),
-                                    SizedBox(height:6),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
-                  );
-
-                }
-            ),
-          ),
-          Container(
-            padding: EdgeInsets.all(24),
-            decoration: BoxDecoration(
-              color: Colors.white,
-            ),
-            child: SafeArea(
-                child: ElevatedButton(
-                  onPressed: (){
-                    Navigator.popUntil(context, (route)=> route.isFirst);
-                  },
-                  style: ElevatedButton.styleFrom(
-                    minimumSize: Size(double.infinity, 55),
-                    backgroundColor: Color.fromARGB(255, 185, 144, 106),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(28)),
-                  ),
-                  child: Text(
-                    'Done',
-                    style: TextStyle(
-                      fontSize: 18,
-                      color: Colors.white,
-                    ),),
-                )
-            ),
-
-          ),
-
         ],
       ),
+      backgroundColor: Colors.white,
+      body: _isLoading ? _buildLoadingState() : _buildResultsState(),
+    );
+  }
 
+  Widget _buildLoadingState() {
+    return const Center(
+      child: CircularProgressIndicator(),
+    );
+  }
+
+  Widget _buildResultsState() {
+    final double accuracy =
+        (_modelInfo['estimated_accuracy'] ?? 0.0) * 100;
+
+    return Column(
+      children: [
+        // Header
+        Container(
+          padding: const EdgeInsets.all(24),
+          width: double.infinity,
+          child: Column(
+            children: [
+              const Icon(Icons.verified, size: 56, color: Colors.green),
+              const SizedBox(height: 12),
+              const Text(
+                'Scientifically Validated',
+                style: TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                '${accuracy.toStringAsFixed(1)}% Estimated Accuracy',
+                style: const TextStyle(
+                  fontWeight: FontWeight.w600,
+                  color: Colors.green,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Based on ${_modelInfo['products_count']} real products',
+                style: TextStyle(color: Colors.grey[600]),
+              ),
+            ],
+          ),
+        ),
+
+        // Products list
+        Expanded(
+          child: ListView.builder(
+            padding: const EdgeInsets.all(16),
+            itemCount: _recommendedProducts.length,
+            itemBuilder: (context, index) {
+              final product = _recommendedProducts[index];
+
+              return Card(
+                margin: const EdgeInsets.only(bottom: 16),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: ListTile(
+                  leading: Image.asset(
+                    product.image,
+                    width: 60,
+                    errorBuilder: (_, __, ___) =>
+                        const Icon(Icons.shopping_bag),
+                  ),
+                  title: Text(
+                    product.name,
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  subtitle: Text(product.description),
+                  trailing: Text(
+                    product.step,
+                    style: const TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+
+        // Button
+        Padding(
+          padding: const EdgeInsets.all(20),
+          child: ElevatedButton(
+            onPressed: () {
+              Navigator.popUntil(context, (route) => route.isFirst);
+            },
+            style: ElevatedButton.styleFrom(
+              minimumSize: const Size(double.infinity, 52),
+            ),
+            child: const Text(
+              'Start Your Routine',
+              style: TextStyle(fontSize: 18),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  void _showModelInfo() {
+    showModalBottomSheet(
+      context: context,
+      builder: (_) => Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _infoRow('Algorithm', _modelInfo['algorithm']),
+            _infoRow('Method', _modelInfo['method']),
+            _infoRow('Dataset', _modelInfo['dataset']),
+            _infoRow(
+              'Products',
+              '${_modelInfo['products_count']}',
+            ),
+            _infoRow(
+              'Accuracy',
+              '${(_modelInfo['estimated_accuracy'] * 100).toStringAsFixed(1)}%',
+            ),
+            const SizedBox(height: 12),
+            Text(
+              _modelInfo['citation'],
+              style: TextStyle(color: Colors.grey[600], fontSize: 12),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _infoRow(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Row(
+        children: [
+          Expanded(
+            flex: 2,
+            child: Text(label,
+                style: const TextStyle(fontWeight: FontWeight.w600)),
+          ),
+          Expanded(flex: 3, child: Text(value)),
+        ],
+      ),
     );
   }
 }
