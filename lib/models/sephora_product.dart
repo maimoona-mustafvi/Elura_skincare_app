@@ -163,7 +163,6 @@ class SephoraProduct {
   /// Get product category for skincare routine
   String getRoutineStep() {
     String lower = secondaryCategory.toLowerCase();
-    
     if (lower.contains('cleanser') || lower.contains('cleansing')) {
       return 'Step 1: Cleanser';
     } else if (lower.contains('serum') || lower.contains('treatment')) {
@@ -174,7 +173,6 @@ class SephoraProduct {
     } else if (lower.contains('sunscreen') || lower.contains('spf')) {
       return 'Step 4: Sunscreen';
     }
-    
     return 'Treatment';
   }
   

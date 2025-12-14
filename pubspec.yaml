@@ -16,23 +16,15 @@ dependencies:
   geolocator: ^9.0.2
   cupertino_icons: ^1.0.8
   google_fonts: ^5.0.0
+  csv: ^6.0.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-<<<<<<< HEAD
-  # Remove or use older flutter_lints:
-  flutter_lints: ^2.0.0      # Older version
-=======
-  csv: ^6.0.0
->>>>>>> ac76b1a1d7b44905c1506ee4e2bc3e9e0c108afe
 
 flutter:
   uses-material-design: true
   assets:
-<<<<<<< HEAD
-    - assets/images/
-=======
      - assets/images/
      - assets/data/product_info.csv
  
@@ -62,4 +54,3 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
->>>>>>> ac76b1a1d7b44905c1506ee4e2bc3e9e0c108afe

@@ -145,11 +145,11 @@ class _LoginPageState extends State<LoginPage> {
                         }
                         return null;
                       },
-                      onChanged: (value) {
-                        setState(() {
-                          name = value.contains('@') ? value.split('@')[0] : value;
-                        });
-                      },
+                      // onChanged: (value) {
+                      //   setState(() {
+                      //     name = value.contains('@') ? value.split('@')[0] : value;
+                      //   });
+                      // },
                     ),
                     SizedBox(height: 20),
                     TextFormField(

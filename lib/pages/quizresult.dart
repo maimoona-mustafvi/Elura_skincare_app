@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../models/questions.dart';
 import '../models/product.dart';
 import '../services/ml_service_csv.dart';
+import '../utils/routes.dart';
 
 class QuizRecommendations extends StatefulWidget {
   final Map<int, String> userLogs;
@@ -172,8 +173,13 @@ class _QuizRecommendationsState extends State<QuizRecommendations> {
           padding: const EdgeInsets.all(20),
           child: ElevatedButton(
             onPressed: () {
-              Navigator.popUntil(context, (route) => route.isFirst);
+              Navigator.pushNamedAndRemoveUntil(
+                context,
+                MyRoutes.homeRoute,
+                    (route) => false,
+              );
             },
+
             style: ElevatedButton.styleFrom(
               minimumSize: const Size(double.infinity, 52),
             ),
