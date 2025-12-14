@@ -3,8 +3,8 @@ import '../models/questions.dart';
 import '../models/product.dart';
 import '../models/routineModel.dart';
 import '../services/ml_service_csv.dart';
+import '../services/firebase_service.dart';
 import '../utils/routes.dart';
-import '../data/appData.dart';
 
 class QuizRecommendations extends StatefulWidget {
   final Map<int, String> userLogs;
@@ -27,15 +27,18 @@ class QuizRecommendations extends StatefulWidget {
 
 class _QuizRecommendationsState extends State<QuizRecommendations> {
   late MLServiceWithCSV _mlService;
+  late FirebaseService _firebaseService;
   late List<Product> _recommendedProducts = [];
   Map<String, dynamic> _modelInfo = {};
 
   bool _isLoading = true;
+  bool _isSaving = false;
 
   @override
   void initState() {
     super.initState();
     _mlService = MLServiceWithCSV();
+    _firebaseService = FirebaseService();
     _processRecommendations();
   }
 
@@ -98,60 +101,65 @@ class _QuizRecommendationsState extends State<QuizRecommendations> {
     );
   }
 
-  /// Save or update the routine in AppData
-  void _saveRoutineToProfile() {
-    final newRoutine = _createRoutineFromProducts();
+  /// Save routine and products to Firebase
+  Future<void> _saveRoutineToProfile() async {
+    setState(() => _isSaving = true);
 
-    // Check if a recommended/adjusted routine already exists
-    final existingIndex = AppData.allRoutines.indexWhere(
-            (routine) => routine.title == 'Recommended Routine' ||
-            routine.title == 'Adjusted Routine'
-    );
+    try {
+      final newRoutine = _createRoutineFromProducts();
 
-    if (existingIndex != -1) {
-      // Update existing routine
-      AppData.allRoutines[existingIndex] = newRoutine;
+      // Save routine to Firebase
+      await _firebaseService.saveRoutine(newRoutine);
 
-      // Show update message
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Row(
-            children: [
-              Icon(Icons.refresh, color: Colors.white),
-              SizedBox(width: 10),
-              Text('${newRoutine.title} updated successfully!'),
-            ],
-          ),
-          backgroundColor: Colors.orange,
-          duration: const Duration(seconds: 2),
-        ),
-      );
-    } else {
-      // Add new routine
-      AppData.allRoutines.add(newRoutine);
+      // Save/Update recommended products to Firebase
+      await _firebaseService.saveRecommendedProducts(_recommendedProducts);
+
+      setState(() => _isSaving = false);
+
+      if (!mounted) return;
 
       // Show success message
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Row(
             children: [
-              Icon(Icons.check_circle, color: Colors.white),
+              Icon(
+                widget.isAdjusted ? Icons.refresh : Icons.check_circle,
+                color: Colors.white,
+              ),
               SizedBox(width: 10),
-              Text('${newRoutine.title} saved successfully!'),
+              Expanded(
+                child: Text(
+                  widget.isAdjusted
+                      ? 'Routine updated in your profile!'
+                      : 'Routine saved to your profile!',
+                ),
+              ),
             ],
           ),
-          backgroundColor: Colors.green,
+          backgroundColor: widget.isAdjusted ? Colors.orange : Colors.green,
           duration: const Duration(seconds: 2),
         ),
       );
-    }
 
-    // Navigate to home
-    Navigator.pushNamedAndRemoveUntil(
-      context,
-      MyRoutes.homeRoute,
-          (route) => false,
-    );
+      // Navigate to home
+      Navigator.pushNamedAndRemoveUntil(
+        context,
+        MyRoutes.homeRoute,
+            (route) => false,
+      );
+    } catch (e) {
+      setState(() => _isSaving = false);
+
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error saving to profile: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
 
   @override
@@ -161,7 +169,7 @@ class _QuizRecommendationsState extends State<QuizRecommendations> {
         backgroundColor: Colors.white,
         leading: IconButton(
           icon: const Icon(Icons.close, color: Colors.black),
-          onPressed: () => Navigator.pop(context),
+          onPressed: _isSaving ? null : () => Navigator.pop(context),
         ),
         title: Text(
           widget.isAdjusted ? 'Adjusted Routine' : 'Your Recommendations',
@@ -251,7 +259,7 @@ class _QuizRecommendationsState extends State<QuizRecommendations> {
                 SizedBox(width: 12),
                 Expanded(
                   child: Text(
-                    'Your routine has been adjusted based on your symptoms. This will replace your previous recommendations.',
+                    'Your routine has been adjusted based on your symptoms. This will update your recommendations.',
                     style: TextStyle(
                       fontWeight: FontWeight.w500,
                       color: Colors.orange[900],
@@ -347,14 +355,23 @@ class _QuizRecommendationsState extends State<QuizRecommendations> {
           child: Column(
             children: [
               ElevatedButton(
-                onPressed: _saveRoutineToProfile,
+                onPressed: _isSaving ? null : _saveRoutineToProfile,
                 style: ElevatedButton.styleFrom(
                   minimumSize: const Size(double.infinity, 52),
                   backgroundColor: widget.isAdjusted
                       ? Colors.orange
                       : Theme.of(context).primaryColor,
                 ),
-                child: Text(
+                child: _isSaving
+                    ? SizedBox(
+                  height: 20,
+                  width: 20,
+                  child: CircularProgressIndicator(
+                    color: Colors.white,
+                    strokeWidth: 2,
+                  ),
+                )
+                    : Text(
                   widget.isAdjusted
                       ? 'Update My Routine'
                       : 'Start Your Routine',
@@ -363,7 +380,7 @@ class _QuizRecommendationsState extends State<QuizRecommendations> {
               ),
               SizedBox(height: 10),
               TextButton(
-                onPressed: () => Navigator.pop(context),
+                onPressed: _isSaving ? null : () => Navigator.pop(context),
                 child: Text(
                   'Go Back',
                   style: TextStyle(color: Colors.grey[600]),

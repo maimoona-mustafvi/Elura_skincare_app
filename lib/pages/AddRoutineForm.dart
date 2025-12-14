@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:elura_skincare_app/data/appData.dart';
 import 'package:elura_skincare_app/models/routineModel.dart';
+import 'package:elura_skincare_app/services/firebase_service.dart';
 
 class AddRoutinePage extends StatefulWidget {
   @override
@@ -8,44 +8,85 @@ class AddRoutinePage extends StatefulWidget {
 }
 
 class _AddRoutinePageState extends State<AddRoutinePage> {
+  final FirebaseService _firebaseService = FirebaseService();
+
   TextEditingController titleController = TextEditingController();
   TextEditingController subtitleController = TextEditingController();
   List<TextEditingController> stepControllers = [TextEditingController()];
+
+  bool _isSaving = false;
+
   void addStepField() {
     setState(() {
       stepControllers.add(TextEditingController());
     });
   }
+
   void removeStepField(int index) {
     setState(() {
       stepControllers.removeAt(index);
     });
   }
-  void saveRoutine() {
+
+  Future<void> saveRoutine() async {
     List<String> steps = [];
     for (var controller in stepControllers) {
       if (controller.text.isNotEmpty) {
         steps.add(controller.text);
       }
     }
+
     if (titleController.text.isEmpty || steps.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Please fill title and at least one step')),
       );
       return;
     }
-    Routine newRoutine = Routine(
-      title: titleController.text,
-      subtitle: subtitleController.text,
-      image: 'assets/images/routine.jpg',//this part not working yet
-      steps: steps,
-    );
-    AppData.allRoutines.add(newRoutine);
-    Navigator.pop(context);
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Routine added successfully!')),
-    );
+
+    setState(() => _isSaving = true);
+
+    try {
+      Routine newRoutine = Routine(
+        title: titleController.text,
+        subtitle: subtitleController.text,
+        image: 'assets/images/routine.jpg',
+        steps: steps,
+      );
+
+      // Save to Firebase
+      await _firebaseService.saveRoutine(newRoutine);
+
+      setState(() => _isSaving = false);
+
+      if (!mounted) return;
+
+      Navigator.pop(context);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Row(
+            children: [
+              Icon(Icons.check_circle, color: Colors.white),
+              SizedBox(width: 10),
+              Text('Routine added successfully!'),
+            ],
+          ),
+          backgroundColor: Colors.green,
+        ),
+      );
+    } catch (e) {
+      setState(() => _isSaving = false);
+
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error saving routine: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -55,7 +96,7 @@ class _AddRoutinePageState extends State<AddRoutinePage> {
         elevation: 0,
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: Colors.black87),
-          onPressed: () => Navigator.pop(context),
+          onPressed: _isSaving ? null : () => Navigator.pop(context),
         ),
         title: Text(
           'Add Routine',
@@ -79,6 +120,7 @@ class _AddRoutinePageState extends State<AddRoutinePage> {
               SizedBox(height: 10),
               TextField(
                 controller: titleController,
+                enabled: !_isSaving,
                 decoration: InputDecoration(
                   hintText: 'e.g., Weekend Routine',
                   filled: true,
@@ -101,6 +143,7 @@ class _AddRoutinePageState extends State<AddRoutinePage> {
               SizedBox(height: 10),
               TextField(
                 controller: subtitleController,
+                enabled: !_isSaving,
                 decoration: InputDecoration(
                   hintText: 'e.g., Special care for weekends',
                   filled: true,
@@ -125,7 +168,7 @@ class _AddRoutinePageState extends State<AddRoutinePage> {
                   ),
                   IconButton(
                     icon: Icon(Icons.add_circle, color: Color(0xFF9B8780)),
-                    onPressed: addStepField,
+                    onPressed: _isSaving ? null : addStepField,
                   ),
                 ],
               ),
@@ -142,6 +185,7 @@ class _AddRoutinePageState extends State<AddRoutinePage> {
                         Expanded(
                           child: TextField(
                             controller: stepControllers[index],
+                            enabled: !_isSaving,
                             decoration: InputDecoration(
                               hintText: 'Step ${index + 1}',
                               filled: true,
@@ -156,7 +200,7 @@ class _AddRoutinePageState extends State<AddRoutinePage> {
                         if (stepControllers.length > 1)
                           IconButton(
                             icon: Icon(Icons.remove_circle, color: Colors.red),
-                            onPressed: () => removeStepField(index),
+                            onPressed: _isSaving ? null : () => removeStepField(index),
                           ),
                       ],
                     ),
@@ -167,7 +211,7 @@ class _AddRoutinePageState extends State<AddRoutinePage> {
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: saveRoutine,
+                  onPressed: _isSaving ? null : saveRoutine,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Color(0xFF9B8780),
                     padding: EdgeInsets.symmetric(vertical: 15),
@@ -175,7 +219,16 @@ class _AddRoutinePageState extends State<AddRoutinePage> {
                       borderRadius: BorderRadius.circular(15),
                     ),
                   ),
-                  child: Text(
+                  child: _isSaving
+                      ? SizedBox(
+                    height: 20,
+                    width: 20,
+                    child: CircularProgressIndicator(
+                      color: Colors.white,
+                      strokeWidth: 2,
+                    ),
+                  )
+                      : Text(
                     'Save Routine',
                     style: TextStyle(
                       fontSize: 18,
@@ -190,5 +243,15 @@ class _AddRoutinePageState extends State<AddRoutinePage> {
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    titleController.dispose();
+    subtitleController.dispose();
+    for (var controller in stepControllers) {
+      controller.dispose();
+    }
+    super.dispose();
   }
 }

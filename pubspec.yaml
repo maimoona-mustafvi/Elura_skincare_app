@@ -9,14 +9,18 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  firebase_core: ^2.28.0  # Key: Use a version that provides PromiseJsImpl
-  firebase_auth: ^4.19.0  # This version pairs with the core version above[citation:8]
+  firebase_core: ^2.28.0
+  firebase_database: ^10.4.0
+  # Key: Use a version that provides PromiseJsImpl
+  firebase_auth: ^4.19.0
+  # This version pairs with the core version above[citation:8]
   # Your other dependencies...
   http: ^1.1.0
   geolocator: ^9.0.2
   cupertino_icons: ^1.0.8
   google_fonts: ^5.0.0
   csv: ^6.0.0
+  shared_preferences: ^2.2.2
 
 dev_dependencies:
   flutter_test:

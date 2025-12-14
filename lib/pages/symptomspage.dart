@@ -10,14 +10,14 @@ class SymptomPage extends StatefulWidget {
 
   const SymptomPage({
     super.key,
-    this.products = const [],
+    required this.products,  // Changed to required
   });
 
   @override
-  State<StatefulWidget> createState() => quizState();
+  State<StatefulWidget> createState() => _SymptomPageState();
 }
 
-class quizState extends State<SymptomPage> {
+class _SymptomPageState extends State<SymptomPage> {
   int currentIndex = 0;
   final Map<int, String> userLogs = {};
   String selectedOption = '';
@@ -89,6 +89,7 @@ class quizState extends State<SymptomPage> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text("Select an option before pressing next!"),
+          duration: Duration(seconds: 2),
         ),
       );
       return;
@@ -114,6 +115,7 @@ class quizState extends State<SymptomPage> {
       analysis: analysis,
     );
 
+    // Navigate to results
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -128,7 +130,7 @@ class quizState extends State<SymptomPage> {
   }
 
   @override
-  Widget build(BuildContext build) {
+  Widget build(BuildContext context) {
     final currentQuestion = symptomQuestions[currentIndex];
     final progress = (currentIndex + 1) / symptomQuestions.length;
 
@@ -143,94 +145,152 @@ class quizState extends State<SymptomPage> {
           "Symptom Check",
           style: TextStyle(
             color: Colors.black,
+            fontWeight: FontWeight.bold,
           ),
         ),
         centerTitle: true,
+        elevation: 0,
       ),
       backgroundColor: Colors.white,
       body: Padding(
         padding: EdgeInsets.all(20),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Align(
-              alignment: Alignment.centerLeft,
-              child: Text(
+            // Progress indicator
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
                   "Question ${currentIndex + 1} of ${symptomQuestions.length}",
                   style: TextStyle(
                     fontSize: 14,
-                    color: Color.fromARGB(210, 206, 156, 90),
-                  )),
+                    color: Color(0xFFD4A574),
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                Text(
+                  "${((progress) * 100).round()}%",
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Color(0xFFD4A574),
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
             ),
             SizedBox(height: 8),
             LinearProgressIndicator(
               value: progress,
-              color: Color.fromARGB(210, 206, 156, 90),
-              backgroundColor: Colors.grey,
+              color: Color(0xFFD4A574),
+              backgroundColor: Colors.grey.shade200,
               minHeight: 6.0,
+              borderRadius: BorderRadius.circular(3),
             ),
-            SizedBox(height: 20),
-            Align(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                currentQuestion.question,
-                style: TextStyle(
-                  fontSize: 22,
-                  color: Colors.black,
-                  fontWeight: FontWeight.bold,
-                ),
+            SizedBox(height: 30),
+
+            // Question
+            Text(
+              currentQuestion.question,
+              style: TextStyle(
+                fontSize: 24,
+                color: Colors.black,
+                fontWeight: FontWeight.bold,
               ),
             ),
-            SizedBox(height: 20),
+            SizedBox(height: 25),
+
+            // Options
             Expanded(
-              child: ListView.builder(
-                  itemCount: currentQuestion.options.length,
-                  itemBuilder: (context, index) {
-                    String option = currentQuestion.options[index];
-                    return Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 6.0),
-                        child: Container(
-                          decoration: BoxDecoration(
-                            border: Border.all(color: Colors.grey),
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: RadioListTile<String>(
-                            title: Text(
-                              option,
-                              style: TextStyle(
-                                color: Colors.black,
-                                fontSize: 16,
+              child: ListView.separated(
+                itemCount: currentQuestion.options.length,
+                separatorBuilder: (context, index) => SizedBox(height: 12),
+                itemBuilder: (context, index) {
+                  String option = currentQuestion.options[index];
+                  bool isSelected = selectedOption == option;
+
+                  return GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        selectedOption = option;
+                      });
+                    },
+                    child: Container(
+                      padding: EdgeInsets.symmetric(vertical: 18, horizontal: 20),
+                      decoration: BoxDecoration(
+                        color: isSelected ? Color(0xFFD4A574).withOpacity(0.1) : Colors.white,
+                        border: Border.all(
+                          color: isSelected ? Color(0xFFD4A574) : Colors.grey.shade300,
+                          width: isSelected ? 2 : 1,
+                        ),
+                        borderRadius: BorderRadius.circular(15),
+                        boxShadow: isSelected ? [
+                          BoxShadow(
+                            color: Color(0xFFD4A574).withOpacity(0.2),
+                            blurRadius: 4,
+                            spreadRadius: 1,
+                          )
+                        ] : [],
+                      ),
+                      child: Row(
+                        children: [
+                          Container(
+                            width: 24,
+                            height: 24,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                color: isSelected ? Color(0xFFD4A574) : Colors.grey.shade400,
+                                width: isSelected ? 8 : 2,
                               ),
                             ),
-                            value: option,
-                            groupValue: selectedOption,
-                            onChanged: (value) {
-                              setState(() {
-                                selectedOption = value!;
-                              });
-                            },
                           ),
-                        ));
-                  }),
-            ),
-            ElevatedButton(
-              onPressed: nextQuestion,
-              style: ElevatedButton.styleFrom(
-                minimumSize: Size(double.infinity, 55),
-                backgroundColor: Color.fromARGB(210, 206, 156, 90),
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(30)),
+                          SizedBox(width: 16),
+                          Expanded(
+                            child: Text(
+                              option,
+                              style: TextStyle(
+                                fontSize: 17,
+                                color: Colors.black,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                },
               ),
-              child: Text(
-                currentIndex == symptomQuestions.length - 1
-                    ? 'Get Results'
-                    : 'Next',
-                style: TextStyle(
-                  fontSize: 18,
-                  color: Colors.white,
+            ),
+
+            SizedBox(height: 20),
+
+            // Next Button
+            SizedBox(
+              width: double.infinity,
+              height: 56,
+              child: ElevatedButton(
+                onPressed: nextQuestion,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Color(0xFFD4A574),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(15),
+                  ),
+                  elevation: 3,
+                ),
+                child: Text(
+                  currentIndex == symptomQuestions.length - 1
+                      ? 'Get Results'
+                      : 'Next',
+                  style: TextStyle(
+                    fontSize: 18,
+                    color: Colors.white,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ),
-            )
+            ),
           ],
         ),
       ),

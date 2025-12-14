@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'symptomspage.dart';
-import '../data/appData.dart';
 import '../models/product.dart';
+import '../services/firebase_service.dart';
 
 class CalendarPage extends StatefulWidget {
   @override
@@ -9,6 +9,8 @@ class CalendarPage extends StatefulWidget {
 }
 
 class _CalendarPageState extends State<CalendarPage> {
+  final FirebaseService _firebaseService = FirebaseService();
+
   DateTime _currentDate = DateTime.now();
   DateTime _selectedDate = DateTime.now();
   Map<DateTime, String> _routineStatus = {};
@@ -32,6 +34,41 @@ class _CalendarPageState extends State<CalendarPage> {
     return DateTime(date.year, date.month, date.day);
   }
 
+  /// Get recommended products from Firebase
+  Future<List<Product>> _getRecommendedProducts() async {
+    try {
+      List<Product> products = await _firebaseService.fetchRecommendedProducts();
+
+      if (products.isEmpty) {
+        // Show message that no products found
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('No recommended products found. Complete the quiz first!'),
+              backgroundColor: Colors.orange,
+            ),
+          );
+        }
+        return [];
+      }
+
+      return products;
+    } catch (e) {
+      print('Error fetching products: $e');
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error loading products. Please try again.'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+
+      return [];
+    }
+  }
+
   List<DateTime> _getDaysInMonth(DateTime date) {
     final firstDay = DateTime(date.year, date.month, 1);
     final lastDay = DateTime(date.year, date.month + 1, 0);
@@ -42,9 +79,8 @@ class _CalendarPageState extends State<CalendarPage> {
       days.add(DateTime(date.year, date.month, i + 1));
     }
 
-    // Add empty days for the start of the month
-    int startingWeekday = firstDay.weekday; // 1 = Monday, 7 = Sunday
-    int emptyDays = startingWeekday - 1; // Start from Monday
+    int startingWeekday = firstDay.weekday;
+    int emptyDays = startingWeekday - 1;
 
     for (int i = 0; i < emptyDays; i++) {
       days.insert(0, DateTime(date.year, date.month, 0));
@@ -89,39 +125,6 @@ class _CalendarPageState extends State<CalendarPage> {
       case 12: return 'December';
       default: return '';
     }
-  }
-
-  /// Get products from the recommended routine
-  List<Product> _getRecommendedProducts() {
-    // Find the recommended or adjusted routine
-    final recommendedRoutine = AppData.allRoutines.firstWhere(
-          (routine) => routine.title == 'Recommended Routine' ||
-          routine.title == 'Adjusted Routine',
-      orElse: () => AppData.allRoutines.first, // Fallback to first routine
-    );
-
-    // Convert routine steps back to products
-    List<Product> products = [];
-    for (String step in recommendedRoutine.steps) {
-      // Parse step format: "Step 1: Cleanser - Product Name - Description"
-      if (step.contains(':') && step.contains('-')) {
-        List<String> parts = step.split('-');
-        if (parts.length >= 2) {
-          String stepPart = parts[0].trim(); // "Step 1: Cleanser"
-          String name = parts[1].trim();
-          String description = parts.length > 2 ? parts[2].trim() : '';
-
-          products.add(Product(
-            name: name,
-            description: description,
-            step: stepPart,
-            image: 'assets/images/product_placeholder.png',
-          ));
-        }
-      }
-    }
-
-    return products;
   }
 
   Widget _buildLegend() {
@@ -290,24 +293,17 @@ class _CalendarPageState extends State<CalendarPage> {
                 ),
                 SizedBox(height: 12),
 
+                // REACTION BUTTON - FIXED VERSION
                 ElevatedButton(
                   onPressed: () {
+                    // Close dialog first using root navigator
+                    Navigator.of(context, rootNavigator: true).pop();
+
+                    // Update status
                     _updateRoutineStatus('reaction');
-                    Navigator.pop(context); // Close dialog first
 
-                    // Get products from recommended routine
-                    List<Product> products = _getRecommendedProducts();
-
-                    // Navigate to symptom page with products
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => SymptomPage(products: products),
-                      ),
-                    ).then((_) {
-                      // Refresh the state when returning from symptom page
-                      setState(() {});
-                    });
+                    // Start navigation process
+                    _navigateToSymptomPage();
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Color(0xFFFF9800),
@@ -335,7 +331,7 @@ class _CalendarPageState extends State<CalendarPage> {
 
                 SizedBox(height: 20),
                 TextButton(
-                  onPressed: () => Navigator.pop(context),
+                  onPressed: () => Navigator.of(context, rootNavigator: true).pop(),
                   child: Text(
                     'Cancel',
                     style: TextStyle(
@@ -358,7 +354,7 @@ class _CalendarPageState extends State<CalendarPage> {
       child: ElevatedButton.icon(
         onPressed: () {
           _updateRoutineStatus(status);
-          Navigator.pop(context);
+          Navigator.of(context, rootNavigator: true).pop();
         },
         icon: Icon(icon, color: Colors.white),
         label: Text(
@@ -389,7 +385,6 @@ class _CalendarPageState extends State<CalendarPage> {
       _selectedDate = today;
     });
 
-    // Show confirmation
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Row(
@@ -412,6 +407,75 @@ class _CalendarPageState extends State<CalendarPage> {
     );
   }
 
+  void _navigateToSymptomPage() async {
+    // Show loading indicator using root navigator
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return Dialog(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          child: Center(
+            child: CircularProgressIndicator(
+              color: Color(0xFFD4A574),
+              strokeWidth: 3,
+            ),
+          ),
+        );
+      },
+    );
+
+    try {
+      // Get products from Firebase
+      List<Product> products = await _getRecommendedProducts();
+
+      // Close loading indicator
+      if (mounted) {
+        Navigator.of(context, rootNavigator: true).pop();
+      }
+
+      // Small delay to ensure smooth transition
+      await Future.delayed(Duration(milliseconds: 50));
+
+      if (products.isNotEmpty && mounted) {
+        // Navigate to symptom page with products
+        await Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => SymptomPage(products: products),
+          ),
+        );
+
+        // Refresh after returning
+        if (mounted) setState(() {});
+      } else if (mounted) {
+        // Show message if no products
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('No recommended products found. Please complete the quiz first.'),
+            backgroundColor: Colors.orange,
+            duration: Duration(seconds: 3),
+          ),
+        );
+      }
+    } catch (e) {
+      // Close loading indicator if there's an error
+      if (mounted) Navigator.of(context, rootNavigator: true).pop();
+
+      print('Error navigating to symptom page: $e');
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to load products. Please try again.'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     List<DateTime> daysInMonth = _getDaysInMonth(_currentDate);
@@ -425,7 +489,6 @@ class _CalendarPageState extends State<CalendarPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Header
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -464,11 +527,9 @@ class _CalendarPageState extends State<CalendarPage> {
               ),
               SizedBox(height: 16),
 
-              // Legend
               _buildLegend(),
               SizedBox(height: 20),
 
-              // Calendar Container
               Expanded(
                 child: Container(
                   decoration: BoxDecoration(
@@ -484,7 +545,6 @@ class _CalendarPageState extends State<CalendarPage> {
                   ),
                   child: Column(
                     children: [
-                      // Month Navigation
                       Container(
                         padding: EdgeInsets.symmetric(vertical: 12, horizontal: 8),
                         decoration: BoxDecoration(
@@ -516,7 +576,6 @@ class _CalendarPageState extends State<CalendarPage> {
                         ),
                       ),
 
-                      // Weekdays Header
                       Container(
                         padding: EdgeInsets.symmetric(vertical: 14),
                         color: Colors.white,
@@ -541,7 +600,6 @@ class _CalendarPageState extends State<CalendarPage> {
 
                       Divider(height: 0, thickness: 1, color: Colors.grey.shade200),
 
-                      // Calendar Grid
                       Expanded(
                         child: Container(
                           padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -563,7 +621,6 @@ class _CalendarPageState extends State<CalendarPage> {
               ),
               SizedBox(height: 20),
 
-              // Selected Date Info
               if (_routineStatus.containsKey(_normalizeDate(_selectedDate)) &&
                   _selectedDate.month == _currentDate.month)
                 Container(
@@ -630,7 +687,6 @@ class _CalendarPageState extends State<CalendarPage> {
                 ),
               SizedBox(height: _routineStatus.containsKey(_normalizeDate(_selectedDate)) ? 20 : 0),
 
-              // Track Routine Button
               Center(
                 child: ElevatedButton(
                   onPressed: () {
