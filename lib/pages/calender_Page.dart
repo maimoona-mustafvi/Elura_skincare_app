@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'symptomspage.dart';
+import '../data/appData.dart';
+import '../models/product.dart';
 
 class CalendarPage extends StatefulWidget {
   @override
@@ -88,6 +91,39 @@ class _CalendarPageState extends State<CalendarPage> {
     }
   }
 
+  /// Get products from the recommended routine
+  List<Product> _getRecommendedProducts() {
+    // Find the recommended or adjusted routine
+    final recommendedRoutine = AppData.allRoutines.firstWhere(
+          (routine) => routine.title == 'Recommended Routine' ||
+          routine.title == 'Adjusted Routine',
+      orElse: () => AppData.allRoutines.first, // Fallback to first routine
+    );
+
+    // Convert routine steps back to products
+    List<Product> products = [];
+    for (String step in recommendedRoutine.steps) {
+      // Parse step format: "Step 1: Cleanser - Product Name - Description"
+      if (step.contains(':') && step.contains('-')) {
+        List<String> parts = step.split('-');
+        if (parts.length >= 2) {
+          String stepPart = parts[0].trim(); // "Step 1: Cleanser"
+          String name = parts[1].trim();
+          String description = parts.length > 2 ? parts[2].trim() : '';
+
+          products.add(Product(
+            name: name,
+            description: description,
+            step: stepPart,
+            image: 'assets/images/product_placeholder.png',
+          ));
+        }
+      }
+    }
+
+    return products;
+  }
+
   Widget _buildLegend() {
     return Container(
       padding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
@@ -170,18 +206,18 @@ class _CalendarPageState extends State<CalendarPage> {
             Text(
               isCurrentMonth ? '${date.day}' : '',
               style: TextStyle(
-                fontSize: 18, // Increased from 16
+                fontSize: 18,
                 color: isCurrentMonth
                     ? (isToday ? Color(0xFFD4A574) : Color(0xFF333333))
                     : Colors.grey.shade300,
                 fontWeight: isToday ? FontWeight.bold : FontWeight.normal,
               ),
             ),
-            SizedBox(height: 4), // Added spacing
+            SizedBox(height: 4),
             if (dotColor != null && isCurrentMonth)
               Container(
-                width: 10, // Increased from 6
-                height: 10, // Increased from 6
+                width: 10,
+                height: 10,
                 decoration: BoxDecoration(
                   color: dotColor,
                   shape: BoxShape.circle,
@@ -253,13 +289,50 @@ class _CalendarPageState extends State<CalendarPage> {
                   'skipped',
                 ),
                 SizedBox(height: 12),
-                _dialogOptionButton(
-                  context,
-                  'Routine showed me reactions',
-                  Icons.warning,
-                  Color(0xFFFF9800),
-                  'reaction',
+
+                ElevatedButton(
+                  onPressed: () {
+                    _updateRoutineStatus('reaction');
+                    Navigator.pop(context); // Close dialog first
+
+                    // Get products from recommended routine
+                    List<Product> products = _getRecommendedProducts();
+
+                    // Navigate to symptom page with products
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => SymptomPage(products: products),
+                      ),
+                    ).then((_) {
+                      // Refresh the state when returning from symptom page
+                      setState(() {});
+                    });
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Color(0xFFFF9800),
+                    padding: EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.warning, color: Colors.white),
+                      SizedBox(width: 12),
+                      Text(
+                        'Routine showed me reactions',
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Colors.white,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
+
                 SizedBox(height: 20),
                 TextButton(
                   onPressed: () => Navigator.pop(context),
@@ -443,7 +516,7 @@ class _CalendarPageState extends State<CalendarPage> {
                         ),
                       ),
 
-                      // Weekdays Header - Made bigger
+                      // Weekdays Header
                       Container(
                         padding: EdgeInsets.symmetric(vertical: 14),
                         color: Colors.white,
@@ -455,7 +528,7 @@ class _CalendarPageState extends State<CalendarPage> {
                                   day,
                                   textAlign: TextAlign.center,
                                   style: TextStyle(
-                                    fontSize: 16, // Increased from 14
+                                    fontSize: 16,
                                     fontWeight: FontWeight.w600,
                                     color: Color(0xFF666666),
                                   ),
@@ -468,14 +541,14 @@ class _CalendarPageState extends State<CalendarPage> {
 
                       Divider(height: 0, thickness: 1, color: Colors.grey.shade200),
 
-                      // Calendar Grid - Made bigger
+                      // Calendar Grid
                       Expanded(
                         child: Container(
                           padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                           child: GridView.builder(
                             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                               crossAxisCount: 7,
-                              childAspectRatio: 1.1, // Increased from 0.8 for bigger cells
+                              childAspectRatio: 1.1,
                             ),
                             itemCount: daysInMonth.length,
                             itemBuilder: (context, index) {
@@ -490,7 +563,7 @@ class _CalendarPageState extends State<CalendarPage> {
               ),
               SizedBox(height: 20),
 
-              // Selected Date Info - Only show if there's data
+              // Selected Date Info
               if (_routineStatus.containsKey(_normalizeDate(_selectedDate)) &&
                   _selectedDate.month == _currentDate.month)
                 Container(
@@ -566,7 +639,7 @@ class _CalendarPageState extends State<CalendarPage> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Color(0xFFD4A574),
                     foregroundColor: Colors.white,
-                    padding: EdgeInsets.symmetric(horizontal: 40, vertical: 18), // Increased padding
+                    padding: EdgeInsets.symmetric(horizontal: 40, vertical: 18),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(30),
                     ),
@@ -575,12 +648,12 @@ class _CalendarPageState extends State<CalendarPage> {
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Icon(Icons.edit_calendar, size: 22), // Increased icon size
-                      SizedBox(width: 12), // Increased spacing
+                      Icon(Icons.edit_calendar, size: 22),
+                      SizedBox(width: 12),
                       Text(
                         'Track Today\'s Routine',
                         style: TextStyle(
-                          fontSize: 17, // Increased font size
+                          fontSize: 17,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
