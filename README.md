@@ -35,9 +35,10 @@ Elura is a **personalized skincare mobile application** designed to help users b
 
 ### 6. Symptoms tracking
 
-* Retake quiz in case of reaction with some product
-* Questions are further specific to skin concerns and type of reaction. 
-* New suggested products and routine based on reaction of users to products and results stored in firebase realtime database.
+* Allows users to retake the skin quiz in case of a reaction to any product
+* Includes follow-up questions specific to the user’s skin concerns and type of reaction
+* Provides updated product and routine recommendations based on the reported reactions
+* Stores new product recommendations and routine in Firebase Realtime Database
 
 ### 7. Reminders 
 
