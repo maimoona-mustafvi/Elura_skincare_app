@@ -1,6 +1,5 @@
 # Elura
-## Personalized Skincare App (Flutter + Firebase)
-Elura is a personalized skincare mobile application designed to help users build and maintain effective skincare routines. The app recommends skincare products based on skin quizzes and symptom monitoring to match individual skin types and concerns. It allows users to create morning and night routines, track daily routine completion, record reactions to products, receive reminders to maintain consistency and weather-based skincare tips to help users adjust their routines according to environmental conditions. The application is developed using Flutter for the frontend and Firebase Realtime Database for backend services, ensuring a smooth and responsive user experience.
+Elura is a **personalized skincare mobile application** designed to help users build and maintain effective skincare routines. The app recommends skincare products based on skin quizzes and symptom monitoring to match individual skin types and concerns. It allows users to create morning and night routines, track daily routine completion, record reactions to products, receive reminders to maintain consistency and weather-based skincare tips to help users adjust their routines according to environmental conditions. The application is developed using **Flutter** for the frontend and **Firebase Realtime Database** for backend services, ensuring a smooth and responsive user experience.
 
 ## Features
 
